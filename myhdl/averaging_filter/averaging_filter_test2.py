@@ -1,4 +1,4 @@
-from myhdl import InstanceError, block, now, Signal, always, delay, intbv, instance
+from myhdl import InstanceError, block, now, Signal, always, delay, intbv, instance, toVerilog
 from clk import ClkDriver
 from averaging_filter import AveragingFilter2
 
@@ -39,8 +39,8 @@ def AveragingFilterTest():
         yield delay(10)  # out = 55 = 0x37
 
         #### Second Set ####
-        # Input:  0, 0, 0, 0, 1023, 1023, 1023, 1023
-        # Output:    0, 0, 0, 512,  1023, 1023, 1023
+        # Input:  0, 0, 0, 0, 255, 255, 255, 255
+        # Output:    0, 0, 0, 128, 255, 255, 255
 
         reset.next = Signal(1)
         data.next = Signal(intbv(0))
@@ -49,7 +49,7 @@ def AveragingFilterTest():
         reset.next = Signal(0)
         yield delay(10 * 4)
 
-        data.next = Signal(intbv(1023))
+        data.next = Signal(intbv(255))
         yield delay(10 * 4)
 
     return send_signals, display_average, clk_driver, filter

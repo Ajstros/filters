@@ -3,7 +3,6 @@
 #    Output:    0, 0, 0, 512,  1023, 1023, 1023
 
 from myhdl import block, always, intbv, Signal, always_comb
-from clk import ClkDriver
 
 @block
 def AveragingFilter1(clk, reset, data, average):
@@ -11,7 +10,7 @@ def AveragingFilter1(clk, reset, data, average):
     # changing the values 1 clock cycle too late
 
     # data must be an intbv so the previous.next assignment works
-    previous = Signal(intbv(0))
+    previous = Signal(intbv(0, 0, 255))
 
     @always(clk.posedge)
     def update_previous():
@@ -31,25 +30,22 @@ def AveragingFilter2(clk, reset, data, average):
     # changing the values exactly on time
 
     # datastream holds incoming data, new data goes on the left
-    datastream = [Signal(intbv(0)), Signal(intbv(0))]
+    datastream = Signal(intbv(0, 0, 65535))
 
     @always(clk.posedge)
     def update_previous():
         if (reset):
-            for i in range(len(datastream)):
-                datastream[i].next = Signal(intbv(0))
+            datastream.next = Signal(intbv(0, 0, 255))
 
         else:
-            for i in range(1, len(datastream)):
-                datastream[i].next = datastream[i - 1]
-            datastream[0].next = data
+            datastream.next = (data * 2**(len(datastream) - 8)) + datastream[:8]
 
     @always_comb
     def assign_average():
         nonlocal average
 
         if (reset):
-            average.next = Signal(intbv(0))
+            average.next = Signal(intbv(0, 0, 255))
         else:
             # Add 1 so the bit shift rounds up at halves (9/2 = 4.5 ~ 5)
             average.next = sum(datastream) + 1 >> 1
