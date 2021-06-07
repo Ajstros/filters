@@ -3,11 +3,11 @@
 %    Output:    0, 0, 0, 512,  1023, 1023, 1023
 
 %%
-input = [10, 0, 0, 0, 1023, 1023, 1023, 1023];
-moving_average = dsp.MovingAverage('WindowLength', 8);
-output = moving_average(input) % Expecting [0, 0, 0, 512,  1023, 1023, 1023]
-
-%%
-x = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+input = [0, 0, 0, 0, 1023, 1023, 1023, 1023];
+output = zeros(8, 1);
 moving_average = dsp.MovingAverage(2);
-y = moving_average(x)
+for i = 1:8
+    output(i) = moving_average(input(i)); % Expecting [0, 0, 0, 512,  1023, 1023, 1023]
+end
+
+output
